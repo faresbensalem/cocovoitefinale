@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TypeUtilisateur {
+  ADMIN
+  UTILISATEUR
+}
+
+enum StatutReservation {
+  EN_ATTENTE
+  CONFIRMEE
+  ANNULEE
+}
+
+enum StatutPaiement {
+  EN_ATTENTE
+  REUSSI
+  ECHOUE
+}
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  motDePasse     String
+  nom            String
+  numero         String?          // ✅ Numéro de téléphone (optionnel ou enlève "?" si requis)
+  dateNaissance  DateTime?        // ✅ Date de naissance (optionnel ou enlève "?" si requis)
+  type           TypeUtilisateur  @default(UTILISATEUR)
+
+  trajetsCree    Trajet[]         @relation("TrajetsConducteur")
+  reservations   Reservation[]    @relation("ReservationsPassager")
+  voitures       Voiture[]
+  avisDonnes     Avis[]           @relation("AvisDonnes")
+  avisRecus      Avis[]           @relation("AvisRecus")
+  paiements      Paiement[]
+
+  creeLe         DateTime         @default(now())
+  modifLe        DateTime         @updatedAt
+}
+
+model Voiture {
+  id               String   @id @default(uuid())
+  marque           String
+  modele           String
+  couleur          String
+  immatriculation  String   @unique
+
+  proprietaireId   String
+  proprietaire     User     @relation(fields: [proprietaireId], references: [id])
+
+  creeLe           DateTime @default(now())
+  modifLe          DateTime @updatedAt
+}
+model Trajet {
+  id              String        @id @default(uuid())
+  depart          String
+  adresseDepart   String        // ✅ Nouvelle adresse de départ
+  destination     String
+  adresseArrivee  String        // ✅ Nouvelle adresse d'arrivée
+  date            DateTime
+  places          Int
+  prix            Float
+  animauxAcceptes Boolean       @default(false) // ✅ Animaux autorisés ?
+  bagagesAcceptes Boolean       @default(true)  // ✅ Bagages autorisés ?
+
+  conducteurId    String
+  conducteur      User          @relation("TrajetsConducteur", fields: [conducteurId], references: [id])
+
+  reservations    Reservation[]
+
+  creeLe          DateTime      @default(now())
+  modifLe         DateTime      @updatedAt
+}
+
+
+model Reservation {
+  id            String        @id @default(uuid())
+  trajetId      String
+  passagerId    String
+
+  trajet        Trajet        @relation(fields: [trajetId], references: [id])
+  passager      User          @relation("ReservationsPassager", fields: [passagerId], references: [id])
+  paiement      Paiement?
+
+  nbPlaces      Int
+  statut        StatutReservation @default(EN_ATTENTE)
+
+  creeLe        DateTime      @default(now())
+}
+
+model Avis {
+  id           String   @id @default(uuid())
+  note         Int
+  commentaire  String
+  date         DateTime @default(now())
+
+  auteurId     String
+  cibleId      String
+
+  auteur       User     @relation("AvisDonnes", fields: [auteurId], references: [id])
+  cible        User     @relation("AvisRecus", fields: [cibleId], references: [id])
+}
+
+model Paiement {
+  id              String          @id @default(uuid())
+  utilisateurId   String
+  reservationId   String          @unique
+  montant         Float
+  statut          StatutPaiement  @default(EN_ATTENTE)
+  fournisseur     String
+  transactionRef  String?
+
+  utilisateur     User            @relation(fields: [utilisateurId], references: [id])
+  reservation     Reservation     @relation(fields: [reservationId], references: [id])
+
+  datePaiement    DateTime        @default(now())
+}

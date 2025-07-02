@@ -1,0 +1,5 @@
+-- CreateTable
+CREATE TABLE "Objet" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nom" TEXT NOT NULL
+);
