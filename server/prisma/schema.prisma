@@ -31,6 +31,7 @@ model User {
   numero         String?          // ✅ Numéro de téléphone (optionnel ou enlève "?" si requis)
   dateNaissance  DateTime?        // ✅ Date de naissance (optionnel ou enlève "?" si requis)
   type           TypeUtilisateur  @default(UTILISATEUR)
+  banni          Boolean          @default(false)
 
   trajetsCree    Trajet[]         @relation("TrajetsConducteur")
   reservations   Reservation[]    @relation("ReservationsPassager")
@@ -125,4 +126,14 @@ model Paiement {
   reservation     Reservation     @relation(fields: [reservationId], references: [id])
 
   datePaiement    DateTime        @default(now())
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  nom       String
+  email     String
+  sujet     String
+  message   String
+  lu        Boolean  @default(false)
+  creeLe    DateTime @default(now())
 }

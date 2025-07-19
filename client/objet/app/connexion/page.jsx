@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import Link from "next/link";
@@ -11,6 +11,33 @@ export default function Connexion() {
   const [formData, setFormData] = useState({ email: "", motDePasse: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [banni, setBanni] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/check-session", { credentials: "include" });
+        const data = await res.json();
+        if (data.isAuthenticated && data.user) {
+          if (data.user.banni) {
+            setBanni(true);
+            return;
+          }
+          if (data.user.type === "ADMIN") {
+            window.location.href = "/admin";
+          } else {
+            window.location.href = "/";
+          }
+        } else {
+          setMessage("Erreur de session après connexion. Veuillez réessayer.");
+        }
+      } catch (error) {
+        console.error("Erreur de connexion:", error);
+        setMessage("Erreur de connexion au serveur.");
+      }
+    };
+    checkSession();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,8 +68,19 @@ export default function Connexion() {
 
       if (res.ok) {
         setMessage("Connexion réussie !");
-        // Forcer un rechargement complet de la page
-        window.location.href = '/';
+        // Vérifier le type de l'utilisateur connecté
+        const sessionRes = await fetch("http://localhost:5000/check-session", { credentials: "include" });
+        const sessionData = await sessionRes.json();
+        console.log("DEBUG /check-session:", sessionData);
+        if (sessionData.isAuthenticated && sessionData.user) {
+          if (sessionData.user.type === "ADMIN") {
+            window.location.href = "/admin";
+          } else {
+            window.location.href = "/";
+          }
+        } else {
+          setMessage("Erreur de session après connexion. Veuillez réessayer.");
+        }
       } else {
         setMessage(data.error || "Erreur lors de la connexion.");
       }
@@ -53,6 +91,17 @@ export default function Connexion() {
       setLoading(false);
     }
   };
+
+  if (banni) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="bg-white p-8 rounded shadow text-center">
+          <h2 className="text-2xl font-bold text-red-700 mb-4">Compte banni</h2>
+          <p className="text-red-600">Votre compte a été banni par un administrateur.<br/>Contactez le support si besoin.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 bg-cover bg-center font-sans">

@@ -9,6 +9,8 @@ import { IoPeople } from "react-icons/io5";
 import { FcPrevious, FcNext } from "react-icons/fc";
 import { MdLuggage } from "react-icons/md";
 import Link from "next/link";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const containerStyle = {
   width: "100%",
@@ -35,7 +37,7 @@ export default function Publier() {
     adresseDepart: "",
     destination: "",
     adresseArrivee: "",
-    date: "",
+    date: null, // On stocke un objet Date natif
     places: 1,
     prix: 0,
     animauxAcceptes: false,
@@ -168,6 +170,7 @@ export default function Publier() {
     try {
       const trajetData = {
         ...formData,
+        date: formData.date ? formData.date.toISOString() : "",
         conducteurId: user.id,
         voitureId: selectedVehicle // Ajout de l'ID de la voiture
       };
@@ -233,6 +236,11 @@ export default function Publier() {
       </div>
     );
   }
+
+  // Calcul de la date d'hier à minuit
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
 
   return (
     <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY} libraries={["places"]}>
@@ -363,15 +371,17 @@ export default function Publier() {
                   {/* Date et Heure */}
                   <div className="mb-6">
                     <label htmlFor="date" className="block text-lg font-semibold text-gray-800 mb-2">Date et heure de départ</label>
-                    <div className="relative">
-                      <CiCalendarDate className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 text-xl" />
-                      <input
-                        type="datetime-local"
-                        id="date"
-                        name="date"
-                        value={formData.date}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    <div className="flex flex-col items-center">
+                      <DatePicker
+                        selected={formData.date}
+                        onChange={date => setFormData(prev => ({ ...prev, date }))}
+                        showTimeSelect
+                        timeFormat="HH:mm"
+                        timeIntervals={15}
+                        dateFormat="dd/MM/yyyy HH:mm"
+                        minDate={yesterday}
+                        inline
+                        calendarClassName="rounded-xl shadow-lg border border-blue-200 bg-white p-2"
                         required
                       />
                     </div>

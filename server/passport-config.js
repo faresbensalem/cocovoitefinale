@@ -21,6 +21,11 @@ passport.use(
           return done(null, false, { message: "Email incorrect" });
         }
 
+        // Vérifier si l'utilisateur est banni
+        if (user.banni) {
+          return done(null, false, { message: "Votre compte a été banni par un administrateur" });
+        }
+
         const isValid = await bcrypt.compare(password, user.motDePasse);
 
         if (!isValid) {
@@ -50,6 +55,7 @@ passport.deserializeUser(async (id, done) => {
         numero: true,
         dateNaissance: true,
         type: true,
+        banni: true,
       },
     });
     done(null, user);

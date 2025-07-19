@@ -27,6 +27,14 @@ const isAuthenticated = (req, res, next) => {
   res.status(401).json({ error: "Non authentifié" });
 };
 
+// Middleware pour vérifier l'admin
+function requireAdmin(req, res, next) {
+  if (req.isAuthenticated() && req.user.type === "ADMIN") {
+    return next();
+  }
+  res.status(403).json({ error: "Accès réservé aux administrateurs." });
+}
+
 // Route d'inscription
 router.post("/register", async (req, res) => {
   try {
@@ -125,7 +133,8 @@ router.get("/check-session", async (req, res) => {
           numero: user.numero,
           dateNaissance: user.dateNaissance,
           type: user.type,
-          voitures: user.voitures
+          voitures: user.voitures,
+          banni: user.banni
         }
       });
     } else {
@@ -809,6 +818,140 @@ router.get("/avis/conducteur/:id", async (req, res) => {
   } catch (error) {
     console.error("Erreur lors de la récupération des avis:", error);
     res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+// Liste des utilisateurs (admin only)
+router.get("/admin/users", requireAdmin, async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        nom: true,
+        type: true,
+        numero: true,
+        dateNaissance: true,
+        banni: true
+      }
+    });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération des utilisateurs" });
+  }
+});
+
+// Liste des trajets (admin only)
+router.get("/admin/trajets", requireAdmin, async (req, res) => {
+  try {
+    const trajets = await prisma.trajet.findMany({
+      include: {
+        conducteur: { select: { id: true, nom: true, email: true } }
+      }
+    });
+    res.json(trajets);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération des trajets" });
+  }
+});
+
+// Bannir ou débannir un utilisateur (admin)
+router.patch("/admin/users/:id/ban", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { banni } = req.body;
+    const user = await prisma.user.update({
+      where: { id },
+      data: { banni: !!banni }
+    });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors du bannissement/dé-bannissement" });
+  }
+});
+
+// Supprimer un trajet (admin)
+router.delete("/admin/trajets/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Vérifier s'il y a des réservations
+    const reservations = await prisma.reservation.findMany({ where: { trajetId: id } });
+    if (reservations.length > 0) {
+      return res.status(400).json({ error: "Impossible de supprimer un trajet qui a des réservations" });
+    }
+    await prisma.trajet.delete({ where: { id } });
+    res.json({ message: "Trajet supprimé par l'admin" });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la suppression du trajet" });
+  }
+});
+
+// Route pour envoyer un message de contact
+router.post("/contact", async (req, res) => {
+  try {
+    const { nom, email, sujet, message } = req.body;
+
+    // Vérification des champs requis
+    if (!nom || !email || !sujet || !message) {
+      return res.status(400).json({ error: "Tous les champs sont obligatoires" });
+    }
+
+    // Création du message de contact
+    const contact = await prisma.contact.create({
+      data: {
+        nom,
+        email,
+        sujet,
+        message
+      }
+    });
+
+    res.status(201).json({ 
+      message: "Message envoyé avec succès",
+      contact 
+    });
+  } catch (error) {
+    console.error("Erreur lors de l'envoi du message:", error);
+    res.status(500).json({ error: "Erreur lors de l'envoi du message" });
+  }
+});
+
+// Route pour récupérer tous les messages de contact (admin only)
+router.get("/admin/contacts", requireAdmin, async (req, res) => {
+  try {
+    const contacts = await prisma.contact.findMany({
+      orderBy: {
+        creeLe: 'desc'
+      }
+    });
+    res.json(contacts);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération des messages" });
+  }
+});
+
+// Route pour marquer un message comme lu (admin)
+router.patch("/admin/contacts/:id/read", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const contact = await prisma.contact.update({
+      where: { id },
+      data: { lu: true }
+    });
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la mise à jour du message" });
+  }
+});
+
+// Route pour supprimer un message de contact (admin)
+router.delete("/admin/contacts/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.contact.delete({ where: { id } });
+    res.json({ message: "Message supprimé avec succès" });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la suppression du message" });
   }
 });
 

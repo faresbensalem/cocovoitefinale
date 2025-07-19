@@ -109,6 +109,11 @@ export default function Inscription() {
     }
   };
 
+  // Calcul de la date max pour avoir 18 ans révolus
+  const today = new Date();
+  const maxBirthdate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+  const maxBirthdateStr = maxBirthdate.toISOString().split("T")[0];
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 bg-cover bg-center font-sans">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden">
@@ -180,7 +185,7 @@ export default function Inscription() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 transition"
                 onChange={handleChange}
                 value={formData.birthdate}
-                max={new Date().toISOString().split("T")[0]}
+                max={maxBirthdateStr}
                 required
               />
             </div>

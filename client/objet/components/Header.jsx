@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaCar, FaSearchLocation, FaRegUserCircle, FaMapSigns } from "react-icons/fa";
+import { FaCar, FaSearchLocation, FaRegUserCircle, FaMapSigns, FaEnvelope, FaQuestionCircle } from "react-icons/fa";
 import { CiCirclePlus, CiBookmarkCheck } from "react-icons/ci";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import logo from "@/public/img/cocologo.png";
@@ -60,6 +60,9 @@ export default function Header({ changePage }) {
     }
   };
 
+  // Détecter si on est sur la page admin
+  const isAdminPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+
   if (loading) {
     return <div className="w-full h-16 bg-white shadow-md"></div>;
   }
@@ -73,66 +76,99 @@ export default function Header({ changePage }) {
         </Link>
       </div>
 
-      {/* Liens centrés */}
-      <nav className={`absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-10 text-gray-700 font-semibold text-base ${
-        menuOpen ? "flex-col space-y-4 mt-4" : "hidden md:flex"
-      }`}>
-        {/* Liens toujours visibles */}
-        <button
-          onClick={() => changePage("recherche")}
-          className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
-        >
-          <FaSearchLocation className="text-2xl" />
-          <span>Recherche</span>
-        </button>
-
-        {!user ? (
-          // Lien visible uniquement pour les visiteurs non connectés
-          <Link
-            href="/connexion"
-            className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
-          >
-            <CiCirclePlus className="text-2xl" />
-            <span>Publier un trajet fares</span>
-          </Link>
-        ) : (
-          // Liens visibles uniquement pour les utilisateurs connectés
-          <>
+      {/* Cacher navigation si admin */}
+      {!isAdminPage && (
+        <>
+          {/* Liens centrés */}
+          <nav className={`absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-10 text-gray-700 font-semibold text-base ${
+            menuOpen ? "flex-col space-y-4 mt-4" : "hidden md:flex"
+          }`}>
+            {/* Liens toujours visibles */}
             <button
-              onClick={() => changePage("publier")}
+              onClick={() => changePage("recherche")}
               className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
             >
-              <CiCirclePlus className="text-2xl" />
-              <span>Publier un trajet</span>
+              <FaSearchLocation className="text-2xl" />
+              <span>Recherche</span>
             </button>
-            <Link
-              href="/mestrajet"
-              className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              <FaMapSigns className="text-2xl" />
-              <span>trajets</span>
-            </Link>
-            <Link
-              href="/reservations"
-              className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              <CiBookmarkCheck className="text-2xl" />
-              <span>réservations</span>
-            </Link>
-            <Link
-              href="/voiture"
-              className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              <FaCar className="text-2xl" />
-              <span>mon auto</span>
-            </Link>
-          </>
-        )}
-      </nav>
 
-      {/* Menu utilisateur */}
+            {!user ? (
+              <>
+                {/* Liens visibles uniquement pour les visiteurs non connectés */}
+                <Link
+                  href="/connexion"
+                  className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <CiCirclePlus className="text-2xl" />
+                  <span>Publier un trajet </span>
+                </Link>
+                <Link
+                  href="/contact"
+                  className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <FaEnvelope className="text-2xl" />
+                  <span>Contact</span>
+                </Link>
+                <Link
+                  href="/comment-ca-marche"
+                  className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <FaQuestionCircle className="text-2xl" />
+                  <span>Comment ça marche</span>
+                </Link>
+              </>
+            ) : (
+              // Liens visibles uniquement pour les utilisateurs connectés
+              <>
+                <button
+                  onClick={() => changePage("publier")}
+                  className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <CiCirclePlus className="text-2xl" />
+                  <span>Publier un trajet</span>
+                </button>
+                <Link
+                  href="/mestrajet"
+                  className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <FaMapSigns className="text-2xl" />
+                  <span>trajets</span>
+                </Link>
+                <Link
+                  href="/reservations"
+                  className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <CiBookmarkCheck className="text-2xl" />
+                  <span>réservations</span>
+                </Link>
+                <Link
+                  href="/voiture"
+                  className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <FaCar className="text-2xl" />
+                  <span>mon auto</span>
+                </Link>
+              </>
+            )}
+          </nav>
+
+          {/* Burger menu mobile */}
+          <div
+            className="md:hidden text-2xl text-gray-700 cursor-pointer"
+            onClick={toggleMenu}
+          >
+            {menuOpen ? (
+              <IoIosArrowUp className="text-3xl" />
+            ) : (
+              <IoIosArrowDown className="text-3xl" />
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Menu utilisateur - toujours visible */}
       <div className="relative flex items-center">
-        {user && (
+        {user && !isAdminPage && (
           <span className="mr-4 text-gray-700 font-semibold hidden md:inline-block">
             Bonjour, {user.nom || user.email}
           </span>
@@ -186,18 +222,6 @@ export default function Header({ changePage }) {
               </>
             )}
           </div>
-        )}
-      </div>
-
-      {/* Burger menu mobile */}
-      <div
-        className="md:hidden text-2xl text-gray-700 cursor-pointer"
-        onClick={toggleMenu}
-      >
-        {menuOpen ? (
-          <IoIosArrowUp className="text-3xl" />
-        ) : (
-          <IoIosArrowDown className="text-3xl" />
         )}
       </div>
     </header>

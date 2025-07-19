@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@react-google-maps/api": "^2.20.6"
+    "@react-google-maps/api": "^2.20.6",
+    "nodemailer": "^7.0.5"
   }
 }
