@@ -28,8 +28,6 @@ export default function Connexion() {
           } else {
             window.location.href = "/";
           }
-        } else {
-          setMessage("Erreur de session après connexion. Veuillez réessayer.");
         }
       } catch (error) {
         console.error("Erreur de connexion:", error);
@@ -79,7 +77,7 @@ export default function Connexion() {
             window.location.href = "/";
           }
         } else {
-          setMessage("Erreur de session après connexion. Veuillez réessayer.");
+          setMessage("Erreur lors de la vérification de session. Veuillez réessayer.");
         }
       } else {
         setMessage(data.error || "Erreur lors de la connexion.");

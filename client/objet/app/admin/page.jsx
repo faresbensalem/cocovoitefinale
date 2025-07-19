@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaUsers, FaCar, FaSignOutAlt, FaExclamationTriangle, FaTrash, FaBan, FaCheckCircle, FaEnvelope } from "react-icons/fa";
+import { FaUsers, FaCar, FaSignOutAlt, FaExclamationTriangle, FaTrash, FaBan, FaCheckCircle, FaEnvelope, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -17,6 +17,42 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  
+  // États de pagination
+  const [currentUserPage, setCurrentUserPage] = useState(1);
+  const [currentTrajetPage, setCurrentTrajetPage] = useState(1);
+  const [itemsPerPage] = useState(6);
+
+  // Calculer les éléments à afficher pour la pagination
+  const filteredUsers = users.filter(u =>
+    (u.nom && u.nom.toLowerCase().includes(searchUser.toLowerCase())) ||
+    (u.email && u.email.toLowerCase().includes(searchUser.toLowerCase()))
+  );
+  
+  const filteredTrajets = trajets.filter(t =>
+    (t.depart && t.depart.toLowerCase().includes(searchTrajet.toLowerCase())) ||
+    (t.destination && t.destination.toLowerCase().includes(searchTrajet.toLowerCase())) ||
+    (t.conducteur && t.conducteur.nom && t.conducteur.nom.toLowerCase().includes(searchTrajet.toLowerCase()))
+  );
+
+  const indexOfLastUser = currentUserPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalUserPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  const indexOfLastTrajet = currentTrajetPage * itemsPerPage;
+  const indexOfFirstTrajet = indexOfLastTrajet - itemsPerPage;
+  const currentTrajets = filteredTrajets.slice(indexOfFirstTrajet, indexOfLastTrajet);
+  const totalTrajetPages = Math.ceil(filteredTrajets.length / itemsPerPage);
+
+  // Réinitialiser la pagination quand la recherche change
+  useEffect(() => {
+    setCurrentUserPage(1);
+  }, [searchUser]);
+
+  useEffect(() => {
+    setCurrentTrajetPage(1);
+  }, [searchTrajet]);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -174,6 +210,110 @@ export default function AdminPage() {
     });
   };
 
+  // Fonctions de pagination pour utilisateurs
+  const goToUserPage = (pageNumber) => {
+    setCurrentUserPage(pageNumber);
+  };
+
+  const goToPreviousUserPage = () => {
+    setCurrentUserPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const goToNextUserPage = () => {
+    setCurrentUserPage(prev => Math.min(prev + 1, totalUserPages));
+  };
+
+  // Fonctions de pagination pour trajets
+  const goToTrajetPage = (pageNumber) => {
+    setCurrentTrajetPage(pageNumber);
+  };
+
+  const goToPreviousTrajetPage = () => {
+    setCurrentTrajetPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const goToNextTrajetPage = () => {
+    setCurrentTrajetPage(prev => Math.min(prev + 1, totalTrajetPages));
+  };
+
+  // Générer les numéros de page à afficher
+  const getPageNumbers = (currentPage, totalPages) => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
+
+  // Composant de pagination réutilisable
+  const Pagination = ({ currentPage, totalPages, onPageChange, onPrevious, onNext }) => {
+    if (totalPages <= 1) return null;
+    
+    return (
+      <div className="flex justify-center items-center mt-6 space-x-2">
+        <button
+          onClick={onPrevious}
+          disabled={currentPage === 1}
+          className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <FaChevronLeft className="w-4 h-4" />
+        </button>
+        
+        {getPageNumbers(currentPage, totalPages).map((pageNumber, index) => (
+          <button
+            key={index}
+            onClick={() => typeof pageNumber === 'number' ? onPageChange(pageNumber) : null}
+            disabled={pageNumber === '...'}
+            className={`px-3 py-2 text-sm font-medium rounded-md ${
+              pageNumber === currentPage
+                ? 'bg-blue-600 text-white'
+                : pageNumber === '...'
+                ? 'text-gray-400 cursor-default'
+                : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {pageNumber}
+          </button>
+        ))}
+        
+        <button
+          onClick={onNext}
+          disabled={currentPage === totalPages}
+          className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <FaChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
+
   if (!user || user.type !== "ADMIN") {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   }
@@ -233,6 +373,17 @@ export default function AdminPage() {
               value={searchUser}
               onChange={e => setSearchUser(e.target.value)}
             />
+            
+            {/* Informations sur les résultats */}
+            <div className="mb-4 text-sm text-gray-600">
+              {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? 's' : ''} trouvé{filteredUsers.length > 1 ? 's' : ''}
+              {totalUserPages > 1 && (
+                <span className="ml-2">
+                  (page {currentUserPage} sur {totalUserPages})
+                </span>
+              )}
+            </div>
+
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-blue-100">
                 <thead>
@@ -246,10 +397,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.filter(u =>
-                    (u.nom && u.nom.toLowerCase().includes(searchUser.toLowerCase())) ||
-                    (u.email && u.email.toLowerCase().includes(searchUser.toLowerCase()))
-                  ).map(u => (
+                  {currentUsers.map(u => (
                     <tr key={u.id} className="hover:bg-blue-50 transition">
                       <td className="px-4 py-2">
                         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg">
@@ -283,6 +431,15 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination pour utilisateurs */}
+            <Pagination
+              currentPage={currentUserPage}
+              totalPages={totalUserPages}
+              onPageChange={goToUserPage}
+              onPrevious={goToPreviousUserPage}
+              onNext={goToNextUserPage}
+            />
           </div>
         )}
         {section === "trajets" && (
@@ -295,6 +452,17 @@ export default function AdminPage() {
               value={searchTrajet}
               onChange={e => setSearchTrajet(e.target.value)}
             />
+            
+            {/* Informations sur les résultats */}
+            <div className="mb-4 text-sm text-gray-600">
+              {filteredTrajets.length} trajet{filteredTrajets.length > 1 ? 's' : ''} trouvé{filteredTrajets.length > 1 ? 's' : ''}
+              {totalTrajetPages > 1 && (
+                <span className="ml-2">
+                  (page {currentTrajetPage} sur {totalTrajetPages})
+                </span>
+              )}
+            </div>
+
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-green-100">
                 <thead>
@@ -307,11 +475,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {trajets.filter(t =>
-                    (t.depart && t.depart.toLowerCase().includes(searchTrajet.toLowerCase())) ||
-                    (t.destination && t.destination.toLowerCase().includes(searchTrajet.toLowerCase())) ||
-                    (t.conducteur && t.conducteur.nom && t.conducteur.nom.toLowerCase().includes(searchTrajet.toLowerCase()))
-                  ).map(t => (
+                  {currentTrajets.map(t => (
                     <tr key={t.id} className="hover:bg-green-50 transition">
                       <td className="px-4 py-2 font-medium text-gray-800">{t.depart}</td>
                       <td className="px-4 py-2 font-medium text-gray-800">{t.destination}</td>
@@ -330,6 +494,15 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination pour trajets */}
+            <Pagination
+              currentPage={currentTrajetPage}
+              totalPages={totalTrajetPages}
+              onPageChange={goToTrajetPage}
+              onPrevious={goToPreviousTrajetPage}
+              onNext={goToNextTrajetPage}
+            />
           </div>
         )}
         {section === "signalisation" && (

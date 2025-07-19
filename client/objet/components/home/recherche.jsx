@@ -7,6 +7,7 @@ import { FaUsersLine } from "react-icons/fa6";
 import { MdLuggage } from "react-icons/md";
 import { FaDog } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 import Link from "next/link";
@@ -80,7 +81,20 @@ export default function Recherche({
   const [allowBaggage, setAllowBaggage] = useState(false);
   const [allowAnimals, setAllowAnimals] = useState(false);
   const [user, setUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [trajetsPerPage] = useState(3);
   const router = useRouter();
+
+  // Calculer les trajets à afficher pour la page courante
+  const indexOfLastTrajet = currentPage * trajetsPerPage;
+  const indexOfFirstTrajet = indexOfLastTrajet - trajetsPerPage;
+  const currentTrajets = filteredTrajets.slice(indexOfFirstTrajet, indexOfLastTrajet);
+  const totalPages = Math.ceil(filteredTrajets.length / trajetsPerPage);
+
+  // Réinitialiser la page courante quand les filtres changent
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredTrajets]);
 
   // Appliquer les valeurs initiales à l'ouverture
   useEffect(() => {
@@ -178,6 +192,55 @@ export default function Recherche({
       result.sort((a, b) => a.prix - b.prix);
     }
     setFilteredTrajets(result);
+  };
+
+  // Fonctions de pagination
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  // Générer les numéros de page à afficher
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   return (
@@ -342,93 +405,144 @@ export default function Recherche({
                 </div>
               </div>
             ) : (
-              filteredTrajets.map((trajet, index) => {
-                const dateTrajet = new Date(trajet.date);
-                const dateFormatted = dateTrajet.toLocaleDateString('fr-FR', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                });
-                // Calcul du nombre de places réservées
-                const placesReservees = Array.isArray(trajet.reservations)
-                  ? trajet.reservations.reduce((total, r) => total + (r.nbPlaces || 0), 0)
-                  : 0;
-                const placesDisponibles = trajet.places - placesReservees;
-                const isComplet = placesDisponibles <= 0;
+              <>
+                {/* Informations sur les résultats */}
+                <div className="mb-4 text-sm text-gray-600">
+                  {filteredTrajets.length} trajet{filteredTrajets.length > 1 ? 's' : ''} trouvé{filteredTrajets.length > 1 ? 's' : ''}
+                  {totalPages > 1 && (
+                    <span className="ml-2">
+                      (page {currentPage} sur {totalPages})
+                    </span>
+                  )}
+                </div>
 
-                return (
-                  <div
-                    key={trajet.id}
-                    className="flex flex-col sm:flex-row items-center justify-between w-full bg-[#f7fafc] rounded-lg shadow-md p-4 my-2"
-                  >
-                    <div className="flex flex-col w-full">
-                      <p className="text-xl font-semibold text-[#2d3748]">
-                        {trajet.depart} → {trajet.destination}
-                      </p>
-                      <div className="flex items-center text-sm text-gray-600 mt-1">
-                        <CiCalendarDate className="mr-1 text-lg" />
-                        <span>Départ: {dateFormatted}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600 mt-1">
-                        <FaUsersLine className="mr-1 text-lg" />
-                        <span className="flex items-center gap-1">
-                          {Array.from({ length: trajet.places }).map((_, i) => (
-                            <FaUser
-                              key={i}
-                              className={
-                                i < placesReservees
-                                  ? "text-blue-500"
-                                  : "text-gray-400"
-                              }
-                              title={i < placesReservees ? "Place réservée" : "Place libre"}
-                            />
-                          ))}
-                          <span className="ml-2 text-xs">
-                            {isComplet ? (
-                              <span className="text-red-600 font-bold">Complet</span>
-                            ) : (
-                              <>
-                                {placesDisponibles} libre{placesDisponibles > 1 ? "s" : ""} / {trajet.places}
-                              </>
-                            )}
+                {/* Liste des trajets */}
+                {currentTrajets.map((trajet, index) => {
+                  const dateTrajet = new Date(trajet.date);
+                  const dateFormatted = dateTrajet.toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  });
+                  // Calcul du nombre de places réservées
+                  const placesReservees = Array.isArray(trajet.reservations)
+                    ? trajet.reservations.reduce((total, r) => total + (r.nbPlaces || 0), 0)
+                    : 0;
+                  const placesDisponibles = trajet.places - placesReservees;
+                  const isComplet = placesDisponibles <= 0;
+
+                  return (
+                    <div
+                      key={trajet.id}
+                      className="flex flex-col sm:flex-row items-center justify-between w-full bg-[#f7fafc] rounded-lg shadow-md p-4 my-2"
+                    >
+                      <div className="flex flex-col w-full">
+                        <p className="text-xl font-semibold text-[#2d3748]">
+                          {trajet.depart} → {trajet.destination}
+                        </p>
+                        <div className="flex items-center text-sm text-gray-600 mt-1">
+                          <CiCalendarDate className="mr-1 text-lg" />
+                          <span>Départ: {dateFormatted}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600 mt-1">
+                          <FaUsersLine className="mr-1 text-lg" />
+                          <span className="flex items-center gap-1">
+                            {Array.from({ length: trajet.places }).map((_, i) => (
+                              <FaUser
+                                key={i}
+                                className={
+                                  i < placesReservees
+                                    ? "text-blue-500"
+                                    : "text-gray-400"
+                                }
+                                title={i < placesReservees ? "Place réservée" : "Place libre"}
+                              />
+                            ))}
+                            <span className="ml-2 text-xs">
+                              {isComplet ? (
+                                <span className="text-red-600 font-bold">Complet</span>
+                              ) : (
+                                <>
+                                  {placesDisponibles} libre{placesDisponibles > 1 ? "s" : ""} / {trajet.places}
+                                </>
+                              )}
+                            </span>
                           </span>
-                        </span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600 mt-1">
+                          <span>Conducteur: {trajet.conducteur.nom}</span>
+                        </div>
+                        <div className="flex items-center mt-2 space-x-4">
+                          {trajet.animauxAcceptes && <FaDog className="text-xl text-gray-600" title="Animaux acceptés" />}
+                          {trajet.bagagesAcceptes && <MdLuggage className="text-xl text-gray-600" title="Bagages acceptés" />}
+                        </div>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600 mt-1">
-                        <span>Conducteur: {trajet.conducteur.nom}</span>
-                      </div>
-                      <div className="flex items-center mt-2 space-x-4">
-                        {trajet.animauxAcceptes && <FaDog className="text-xl text-gray-600" title="Animaux acceptés" />}
-                        {trajet.bagagesAcceptes && <MdLuggage className="text-xl text-gray-600" title="Bagages acceptés" />}
+                      <div className="flex flex-col justify-center items-center mt-4 sm:mt-0 sm:ml-4">
+                        <p className="text-xl font-bold text-gray-600">{trajet.prix} €</p>
+                        {isComplet ? (
+                          <div className="bg-red-100 text-red-600 px-6 py-2 rounded-md mt-2 text-center font-semibold">
+                            Complet
+                          </div>
+                        ) : trajet.conducteurId === user?.id ? (
+                          <div className="bg-gray-200 text-gray-600 px-6 py-2 rounded-md mt-2 cursor-not-allowed text-center">
+                            Votre trajet
+                          </div>
+                        ) : (
+                          <a
+                            href={`/trajetdetail/${trajet.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-green-600 text-white px-6 py-2 rounded-md mt-2 hover:bg-[#2f855a] transition-colors inline-block text-center"
+                          >
+                            Voir
+                          </a>
+                        )}
                       </div>
                     </div>
-                    <div className="flex flex-col justify-center items-center mt-4 sm:mt-0 sm:ml-4">
-                      <p className="text-xl font-bold text-gray-600">{trajet.prix} €</p>
-                      {isComplet ? (
-                        <div className="bg-red-100 text-red-600 px-6 py-2 rounded-md mt-2 text-center font-semibold">
-                          Complet
-                        </div>
-                      ) : trajet.conducteurId === user?.id ? (
-                        <div className="bg-gray-200 text-gray-600 px-6 py-2 rounded-md mt-2 cursor-not-allowed text-center">
-                          Votre trajet
-                        </div>
-                      ) : (
-                        <a
-                          href={`/trajetdetail/${trajet.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-green-600 text-white px-6 py-2 rounded-md mt-2 hover:bg-[#2f855a] transition-colors inline-block text-center"
-                        >
-                          Voir
-                        </a>
-                      )}
-                    </div>
+                  );
+                })}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center mt-6 space-x-2">
+                    <button
+                      onClick={goToPreviousPage}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FaChevronLeft className="w-4 h-4" />
+                    </button>
+                    
+                    {getPageNumbers().map((pageNumber, index) => (
+                      <button
+                        key={index}
+                        onClick={() => typeof pageNumber === 'number' ? goToPage(pageNumber) : null}
+                        disabled={pageNumber === '...'}
+                        className={`px-3 py-2 text-sm font-medium rounded-md ${
+                          pageNumber === currentPage
+                            ? 'bg-blue-600 text-white'
+                            : pageNumber === '...'
+                            ? 'text-gray-400 cursor-default'
+                            : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    ))}
+                    
+                    <button
+                      onClick={goToNextPage}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FaChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
-                );
-              })
+                )}
+              </>
             )}
           </div>
         </div>

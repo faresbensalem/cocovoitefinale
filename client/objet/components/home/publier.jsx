@@ -45,6 +45,9 @@ export default function Publier() {
   });
 
   useEffect(() => {
+    // Réinitialiser l'erreur au chargement de la page
+    setError(null);
+    
     const checkSession = async () => {
       try {
         console.log("Vérification de la session...");
@@ -118,6 +121,8 @@ export default function Publier() {
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
     }));
+    // Effacer l'erreur quand l'utilisateur modifie le formulaire
+    setError(null);
   };
 
   const handlePlaceSelect = (autocomplete, field) => {
@@ -152,6 +157,8 @@ export default function Publier() {
           arriveeLng: place.geometry.location.lng(),
         }));
       }
+      // Effacer l'erreur quand l'utilisateur sélectionne un lieu
+      setError(null);
     }
   };
 
@@ -196,11 +203,17 @@ export default function Publier() {
   };
 
   const nextPage = () => {
-    if (currentPage < 3) setCurrentPage(currentPage + 1);
+    if (currentPage < 3) {
+      setCurrentPage(currentPage + 1);
+      setError(null); // Effacer l'erreur quand on change de page
+    }
   };
 
   const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      setError(null); // Effacer l'erreur quand on change de page
+    }
   };
 
   if (!user) {
@@ -374,7 +387,10 @@ export default function Publier() {
                     <div className="flex flex-col items-center">
                       <DatePicker
                         selected={formData.date}
-                        onChange={date => setFormData(prev => ({ ...prev, date }))}
+                        onChange={date => {
+                          setFormData(prev => ({ ...prev, date }));
+                          setError(null); // Effacer l'erreur quand la date change
+                        }}
                         showTimeSelect
                         timeFormat="HH:mm"
                         timeIntervals={15}
@@ -451,7 +467,10 @@ export default function Publier() {
                         {userVehicles.map((vehicle) => (
                           <div
                             key={vehicle.id}
-                            onClick={() => setSelectedVehicle(vehicle.id)}
+                            onClick={() => {
+                              setSelectedVehicle(vehicle.id);
+                              setError(null); // Effacer l'erreur quand une voiture est sélectionnée
+                            }}
                             className={`p-4 border rounded-lg cursor-pointer transition-all ${
                               selectedVehicle === vehicle.id
                                 ? "border-blue-500 bg-blue-50"
