@@ -8,6 +8,7 @@ import { FaUsersLine } from "react-icons/fa6";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/navigation";
 
 // Liste des villes canadiennes
 const canadianCities = [
@@ -19,6 +20,18 @@ const canadianCities = [
   { value: "Edmonton", label: "Edmonton" },
   { value: "Québec", label: "Québec" },
   { value: "Winnipeg", label: "Winnipeg" },
+  { value: "Halifax", label: "Halifax" },
+  { value: "Saskatoon", label: "Saskatoon" },
+  { value: "Regina", label: "Regina" },
+  { value: "St. John's", label: "St. John's" },
+  { value: "Victoria", label: "Victoria" },
+  { value: "Gatineau", label: "Gatineau" },
+  { value: "Sherbrooke", label: "Sherbrooke" },
+  { value: "Windsor", label: "Windsor" },
+  { value: "Kelowna", label: "Kelowna" },
+  { value: "Trois-Rivières", label: "Trois-Rivières" },
+  { value: "Saguenay", label: "Saguenay" },
+  { value: "Barrie", label: "Barrie" },
 ];
 
 // Styles personnalisés pour react-select
@@ -53,6 +66,7 @@ export default function Activites() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [departure, setDeparture] = useState(null);
   const [destination, setDestination] = useState(null);
+  const router = useRouter();
 
   return (
     <section className="relative h-[700px] w-[90%] mx-auto overflow-hidden">
@@ -129,7 +143,16 @@ export default function Activites() {
           </div>
 
           {/* Bouton */}
-          <button className="bg-[#258d83] text-white px-6 py-2 rounded-md hover:bg-[#30b5a9] transition-colors">
+          <button
+            className="bg-[#258d83] text-white px-6 py-2 rounded-md hover:bg-[#30b5a9] transition-colors"
+            onClick={() => {
+              const params = new URLSearchParams();
+              if (departure) params.append("departure", departure.value);
+              if (destination) params.append("destination", destination.value);
+              if (selectedDate) params.append("date", selectedDate.toISOString().split("T")[0]);
+              router.push(`/recherche?${params.toString()}`);
+            }}
+          >
             Rechercher
           </button>
         </div>

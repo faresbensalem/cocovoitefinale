@@ -67,6 +67,7 @@ model Trajet {
   prix            Float
   animauxAcceptes Boolean       @default(false) // ✅ Animaux autorisés ?
   bagagesAcceptes Boolean       @default(true)  // ✅ Bagages autorisés ?
+  effectue        Boolean       @default(false)  // Nouveau champ
 
   conducteurId    String
   conducteur      User          @relation("TrajetsConducteur", fields: [conducteurId], references: [id])
@@ -91,19 +92,24 @@ model Reservation {
   statut        StatutReservation @default(EN_ATTENTE)
 
   creeLe        DateTime      @default(now())
+  
+  // Relation avec les avis
+  avis          Avis?
 }
 
 model Avis {
   id           String   @id @default(uuid())
-  note         Int
+  note         Int      @default(0)
   commentaire  String
   date         DateTime @default(now())
 
   auteurId     String
   cibleId      String
+  reservationId String  @unique  // Une réservation ne peut avoir qu'un seul avis
 
   auteur       User     @relation("AvisDonnes", fields: [auteurId], references: [id])
   cible        User     @relation("AvisRecus", fields: [cibleId], references: [id])
+  reservation  Reservation @relation(fields: [reservationId], references: [id])
 }
 
 model Paiement {
