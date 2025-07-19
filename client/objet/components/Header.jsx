@@ -93,7 +93,7 @@ export default function Header({ changePage }) {
             className="flex items-center space-x-2 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105"
           >
             <CiCirclePlus className="text-2xl" />
-            <span>Publier un trajet</span>
+            <span>Publier un trajet fares</span>
           </Link>
         ) : (
           // Liens visibles uniquement pour les utilisateurs connectés
