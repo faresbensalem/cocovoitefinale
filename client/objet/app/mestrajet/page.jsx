@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaMapMarkerAlt, FaCalendarAlt, FaUser, FaUsers, FaEuroSign, FaChevronDown, FaChevronUp, FaCheckCircle } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCalendarAlt, FaUser, FaUsers, FaEuroSign, FaChevronDown, FaChevronUp, FaCheckCircle, FaPhone } from 'react-icons/fa';
 
 export default function MesTrajets() {
   const [trajets, setTrajets] = useState([]);
@@ -148,71 +148,82 @@ export default function MesTrajets() {
   const TrajetCard = ({ trajet, isEffectue }) => (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="p-6 border-b">
-        <div className="flex flex-wrap justify-between items-start gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 text-lg font-semibold mb-2">
-              <FaMapMarkerAlt className="text-green-500" />
-              <span className="truncate">{trajet.depart}</span>
-              <span className="mx-2">→</span>
-              <FaMapMarkerAlt className="text-red-500" />
-              <span className="truncate">{trajet.destination}</span>
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+          {/* Section principale avec les informations du trajet */}
+          <div className="flex-1 min-w-0">
+            {/* Ligne des villes avec gestion de l'espace */}
+            <div className="flex items-center gap-2 text-lg font-semibold mb-3">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <FaMapMarkerAlt className="text-green-500 flex-shrink-0" />
+                <span className="truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px]">{trajet.depart}</span>
+              </div>
+              <span className="mx-2 flex-shrink-0">→</span>
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <FaMapMarkerAlt className="text-red-500 flex-shrink-0" />
+                <span className="truncate max-w-[120px] sm:max-w-[150px] md:max-w-[200px]">{trajet.destination}</span>
+              </div>
             </div>
+            
+            {/* Informations du trajet */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-1">
-                <FaCalendarAlt />
-                {formatDate(trajet.date)}
+                <FaCalendarAlt className="flex-shrink-0" />
+                <span className="truncate">{formatDate(trajet.date)}</span>
               </div>
               <div className="flex items-center gap-1">
-                <FaUsers />
-                {trajet.places} places
+                <FaUsers className="flex-shrink-0" />
+                <span>{trajet.places} places</span>
               </div>
               <div className="flex items-center gap-1">
-                <FaEuroSign />
-                {trajet.prix}€
+                <FaEuroSign className="flex-shrink-0" />
+                <span>{trajet.prix}€</span>
               </div>
             </div>
           </div>
           
-          <div className="flex flex-col gap-2">
+          {/* Section des boutons avec largeur fixe */}
+          <div className="flex flex-col gap-2 w-full lg:w-auto lg:min-w-[200px]">
             {/* Bouton de confirmation pour les trajets passés non effectués */}
             {isTrajetPasse(trajet.date) && !trajet.effectue && (
               <button
                 onClick={() => handleConfirmTrajet(trajet.id)}
                 disabled={confirming === trajet.id}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
                   confirming === trajet.id
                     ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
                     : 'bg-green-500 text-white hover:bg-green-600'
                 }`}
               >
-                <FaCheckCircle className={confirming === trajet.id ? 'animate-spin' : ''} />
-                {confirming === trajet.id ? 'Confirmation...' : 'Confirmer trajet effectué'}
+                <FaCheckCircle className={`flex-shrink-0 ${confirming === trajet.id ? 'animate-spin' : ''}`} />
+                <span className="truncate">
+                  {confirming === trajet.id ? 'Confirmation...' : 'Confirmer trajet effectué'}
+                </span>
               </button>
             )}
             
             {/* Badge pour les trajets effectués */}
             {trajet.effectue && (
-              <div className="flex items-center justify-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg">
-                <FaCheckCircle />
-                Trajet effectué
+              <div className="flex items-center justify-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                <FaCheckCircle className="flex-shrink-0" />
+                <span>Trajet effectué</span>
               </div>
             )}
 
             {/* Bouton pour voir les réservations */}
             <button
               onClick={() => setExpandedTrajet(expandedTrajet === trajet.id ? null : trajet.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
                 trajet.reservations.length > 0 
-                  ? 'text-blue-600 hover:bg-blue-50' 
-                  : 'text-gray-500 cursor-default'
+                  ? 'text-blue-600 hover:bg-blue-50 border border-blue-200' 
+                  : 'text-gray-500 cursor-default bg-gray-100'
               }`}
             >
               {trajet.reservations.length > 0 ? (
                 <>
-                  <span className="font-medium">
+                  <span className="truncate">
                     Voir les réservations ({trajet.reservations.length})
                   </span>
-                  {expandedTrajet === trajet.id ? <FaChevronUp /> : <FaChevronDown />}
+                  {expandedTrajet === trajet.id ? <FaChevronUp className="flex-shrink-0" /> : <FaChevronDown className="flex-shrink-0" />}
                 </>
               ) : (
                 <span>Aucune réservation</span>
@@ -229,20 +240,25 @@ export default function MesTrajets() {
           <div className="grid gap-4">
             {trajet.reservations.map((reservation) => (
               <div key={reservation.id} className="bg-white p-4 rounded-lg shadow border border-gray-100">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
                       <FaUser className="text-white" />
                     </div>
-                    <div>
-                      <p className="font-medium">{reservation.passager.nom}</p>
-                      <p className="text-sm text-gray-600">
-                        {calculateAge(reservation.passager.dateNaissance)}
-                        {reservation.passager.numero && ` • ${reservation.passager.numero}`}
-                      </p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">{reservation.passager.nom}</p>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="truncate">Covoitureur de {calculateAge(reservation.passager.dateNaissance)}</span>
+                        {reservation.passager.numero && (
+                          <div className="flex items-center gap-1 text-blue-600">
+                            <FaPhone className="flex-shrink-0" />
+                            <span className="truncate">{reservation.passager.numero}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right sm:text-left sm:min-w-[120px]">
                     <p className="font-medium text-green-600">{reservation.nbPlaces} place(s)</p>
                     <p className="text-sm text-gray-600">
                       Statut: <span className={`font-medium ${
