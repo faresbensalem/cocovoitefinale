@@ -268,10 +268,15 @@ export default function Publier() {
                   <span className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${currentPage === 1 ? 'border-white bg-blue-700' : 'border-blue-200'}`}>1</span>
                   <span className="ml-2">Itinéraire</span>
                 </div>
-                <div className="border-t-2 border-blue-400 w-16 mt-4"></div>
+                <div className="border-t-2 border-blue-400 w-10 mt-4"></div>
                 <div className={`flex items-center ${currentPage === 2 ? 'text-white' : 'text-blue-200'}`}>
                   <span className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${currentPage === 2 ? 'border-white bg-blue-700' : 'border-blue-200'}`}>2</span>
                   <span className="ml-2">Détails</span>
+                </div>
+                <div className="border-t-2 border-blue-400 w-10 mt-4"></div>
+                <div className={`flex items-center ${currentPage === 3 ? 'text-white' : 'text-blue-200'}`}>
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${currentPage === 3 ? 'border-white bg-blue-700' : 'border-blue-200'}`}>3</span>
+                  <span className="ml-2">Options</span>
                 </div>
               </div>
             </div>
@@ -302,7 +307,7 @@ export default function Publier() {
           <form onSubmit={handleSubmit} className="p-6">
             {/* Page 1: Itinéraire */}
             {currentPage === 1 && (
-              <div className="space-y-6">
+              <div className="min-h-[60vh] max-w-2xl w-full mx-auto flex flex-col justify-center space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Départ */}
                   <div>
@@ -375,15 +380,14 @@ export default function Publier() {
               </div>
             )}
 
-            {/* Page 2 */}
+            {/* Page 2: Détails */}
             {currentPage === 2 && (
-              <>
-                <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Informations du trajet</h2>
-
-                <div className="space-y-6">
+              <div className="min-h-[60vh] max-w-2xl w-full mx-auto flex flex-col justify-center p-2">
+                <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">Détails du trajet</h2>
+                <div className="space-y-4 w-full">
                   {/* Date et Heure */}
-                  <div className="mb-6">
-                    <label htmlFor="date" className="block text-lg font-semibold text-gray-800 mb-2">Date et heure de départ</label>
+                  <div className="mb-4">
+                    <label htmlFor="date" className="block text-lg font-semibold text-gray-800 mb-1">Date et heure de départ</label>
                     <div className="flex flex-col items-center">
                       <DatePicker
                         selected={formData.date}
@@ -402,59 +406,66 @@ export default function Publier() {
                       />
                     </div>
                   </div>
-
-                  {/* Nombre de places */}
-                  <div className="mb-6">
-                    <label htmlFor="places" className="block text-lg font-semibold text-gray-800 mb-2">Nombre de places</label>
-                    <div className="relative">
-                      <IoPeople className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 text-xl" />
-                      <input
-                        type="number"
-                        id="places"
-                        name="places"
-                        min="1"
-                        max="8"
-                        value={formData.places}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        required
-                      />
+                  {/* Nombre de places & Prix côte à côte */}
+                  <div className="mb-4 flex flex-row gap-4 w-full">
+                    <div className="flex-1 min-w-0">
+                      <label htmlFor="places" className="block text-lg font-semibold text-gray-800 mb-1">Nombre de places</label>
+                      <div className="relative">
+                        <IoPeople className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 text-xl" />
+                        <input
+                          type="number"
+                          id="places"
+                          name="places"
+                          min="1"
+                          max="8"
+                          value={formData.places}
+                          onChange={handleChange}
+                          className="w-full max-w-[200px] px-4 py-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label htmlFor="prix" className="block text-lg font-semibold text-gray-800 mb-1">Prix par passager</label>
+                      <div className="relative">
+                        <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 text-xl" />
+                        <input
+                          type="number"
+                          id="prix"
+                          name="prix"
+                          min="0"
+                          step="0.01"
+                          value={formData.prix}
+                          onChange={handleChange}
+                          className="w-full max-w-[200px] px-4 py-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
 
-                  {/* Prix */}
-                  <div className="mb-6">
-                    <label htmlFor="prix" className="block text-lg font-semibold text-gray-800 mb-2">Prix par passager</label>
-                    <div className="relative">
-                      <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 text-xl" />
-                      <input
-                        type="number"
-                        id="prix"
-                        name="prix"
-                        min="0"
-                        step="0.01"
-                        value={formData.prix}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        required
-                      />
-                    </div>
-                  </div>
-
+            {/* Page 3: Voiture et options */}
+            {currentPage === 3 && (
+              <div className="min-h-[60vh] max-w-2xl w-full mx-auto flex flex-col justify-start pt-0 p-2">
+                <h2 className="text-2xl font-semibold text-center text-gray-800 mb-2 mt-0">Voiture et options de voyage</h2>
+                <div className="space-y-8 w-full mt-6">
                   {/* Sélection de la voiture */}
-                  <div className="mb-6">
-                    <label className="block text-lg font-semibold text-gray-800 mb-4">
+                  <div className="mb-2">
+                    <label className="block text-lg font-semibold text-gray-800 mb-2">
                       Sélectionnez votre voiture pour le trajet
                     </label>
                     {isLoadingVehicles ? (
-                      <div className="text-center p-6">
+                      <div className="text-center p-4">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
                         <p className="mt-2 text-gray-600">Chargement de vos voitures...</p>
                       </div>
                     ) : userVehicles.length === 0 ? (
-                      <div className="text-center p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                         <div className="text-3xl mb-2">🚗</div>
-                        <p className="text-gray-700 mb-4">Vous n'avez pas encore ajouté de voiture.</p>
+                        <p className="text-gray-700 mb-2">Vous n'avez pas encore ajouté de voiture.</p>
                         <Link 
                           href="/voiture"
                           className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -463,7 +474,7 @@ export default function Publier() {
                         </Link>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 gap-2">
                         {userVehicles.map((vehicle) => (
                           <div
                             key={vehicle.id}
@@ -471,32 +482,32 @@ export default function Publier() {
                               setSelectedVehicle(vehicle.id);
                               setError(null); // Effacer l'erreur quand une voiture est sélectionnée
                             }}
-                            className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                            className={`p-3 border rounded-lg cursor-pointer transition-all ${
                               selectedVehicle === vehicle.id
                                 ? "border-blue-500 bg-blue-50"
                                 : "border-gray-200 hover:border-blue-300"
                             }`}
                           >
                             <div className="flex items-center">
-                              <div className={`p-3 rounded-full ${
+                              <div className={`p-2 rounded-full ${
                                 selectedVehicle === vehicle.id ? "bg-blue-100" : "bg-gray-100"
                               }`}>
-                                <FaCar className={`text-2xl ${
+                                <FaCar className={`text-xl ${
                                   selectedVehicle === vehicle.id ? "text-blue-500" : "text-gray-400"
                                 }`} />
                               </div>
-                              <div className="ml-4">
-                                <div className="font-semibold text-lg">
+                              <div className="ml-3">
+                                <div className="font-semibold text-base">
                                   {vehicle.marque} {vehicle.modele}
                                 </div>
-                                <div className="text-gray-500">
+                                <div className="text-gray-500 text-sm">
                                   {vehicle.couleur} • {vehicle.immatriculation}
                                 </div>
                               </div>
                               {selectedVehicle === vehicle.id && (
                                 <div className="ml-auto">
                                   <div className="bg-blue-500 text-white rounded-full p-1">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                   </div>
@@ -508,11 +519,10 @@ export default function Publier() {
                       </div>
                     )}
                   </div>
-
                   {/* Préférences */}
-                  <div className="mb-6">
-                    <label className="block text-lg font-semibold text-gray-800 mb-4">Options du trajet</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="mb-2">
+                    <label className="block text-lg font-semibold text-gray-800 mb-2">Options du trajet</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {/* Animaux acceptés */}
                       <div
                         onClick={() => handleChange({
@@ -522,21 +532,20 @@ export default function Publier() {
                             checked: !formData.animauxAcceptes
                           }
                         })}
-                        className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
+                        className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
                           formData.animauxAcceptes 
                             ? "border-blue-500 bg-blue-50" 
                             : "border-gray-200 hover:border-blue-300"
                         }`}
                       >
                         <div className={`p-2 rounded-full ${formData.animauxAcceptes ? "bg-blue-100" : "bg-gray-100"}`}>
-                          <FaDog className={`text-2xl ${formData.animauxAcceptes ? "text-blue-500" : "text-gray-400"}`} />
+                          <FaDog className={`text-xl ${formData.animauxAcceptes ? "text-blue-500" : "text-gray-400"}`} />
                         </div>
-                        <div className="ml-3">
-                          <div className="font-medium">Animaux acceptés</div>
-                          <div className="text-sm text-gray-500">Autoriser les animaux de compagnie</div>
+                        <div className="ml-2">
+                          <div className="font-medium text-base">Animaux acceptés</div>
+                          <div className="text-xs text-gray-500">Autoriser les animaux de compagnie</div>
                         </div>
                       </div>
-
                       {/* Bagages acceptés */}
                       <div
                         onClick={() => handleChange({
@@ -546,28 +555,34 @@ export default function Publier() {
                             checked: !formData.bagagesAcceptes
                           }
                         })}
-                        className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
+                        className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
                           formData.bagagesAcceptes 
                             ? "border-blue-500 bg-blue-50" 
                             : "border-gray-200 hover:border-blue-300"
                         }`}
                       >
                         <div className={`p-2 rounded-full ${formData.bagagesAcceptes ? "bg-blue-100" : "bg-gray-100"}`}>
-                          <MdLuggage className={`text-2xl ${formData.bagagesAcceptes ? "text-blue-500" : "text-gray-400"}`} />
+                          <MdLuggage className={`text-xl ${formData.bagagesAcceptes ? "text-blue-500" : "text-gray-400"}`} />
                         </div>
-                        <div className="ml-3">
-                          <div className="font-medium">Bagages acceptés</div>
-                          <div className="text-sm text-gray-500">Autoriser les bagages</div>
+                        <div className="ml-2">
+                          <div className="font-medium text-base">Bagages acceptés</div>
+                          <div className="text-xs text-gray-500">Autoriser les bagages</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </>
+                <button
+                  type="submit"
+                  className="w-full px-6 py-4 bg-green-600 text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-colors flex items-center justify-center shadow-lg mt-8"
+                >
+                  Publier le trajet ✓
+                </button>
+              </div>
             )}
 
-            {/* Navigation */}
-            <div className="mt-8 flex justify-between">
+            {/* Navigation principale (Retour/Suivant) */}
+            <div className="mb-20 flex justify-between mt-0">
               {currentPage > 1 && (
                 <button
                   type="button"
@@ -577,8 +592,7 @@ export default function Publier() {
                   <FcPrevious className="mr-2" /> Retour
                 </button>
               )}
-              
-              {currentPage < 2 ? (
+              {currentPage < 3 ? (
                 <button
                   type="button"
                   onClick={nextPage}
@@ -588,13 +602,16 @@ export default function Publier() {
                 </button>
               ) : (
                 <button
-                  type="submit"
-                  className="ml-auto px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center"
+                  type="button"
+                  className="ml-auto px-6 py-3 bg-blue-300 text-white rounded-lg font-medium flex items-center opacity-50 cursor-not-allowed"
+                  disabled
                 >
-                  Publier le trajet ✓
+                  Suivant <FcNext className="ml-2" />
                 </button>
               )}
             </div>
+
+            {/* (Suppression du bouton en dehors du bloc principal) */}
           </form>
         </div>
 
@@ -622,3 +639,4 @@ export default function Publier() {
     </LoadScript>
   );
 }
+
