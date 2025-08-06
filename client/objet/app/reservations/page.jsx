@@ -94,7 +94,7 @@ const ReservationCard = ({ reservation, onEvaluation, submitting }) => {
               {reservation.statut}
             </span>
             <span className="font-bold text-lg text-green-600 text-center">
-              {reservation.trajet.prix * reservation.nbPlaces} €
+              {reservation.trajet.prix * reservation.nbPlaces} $CA
             </span>
             <span className="text-sm text-gray-600 text-center">
               {reservation.nbPlaces} place(s)

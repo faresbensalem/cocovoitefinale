@@ -176,7 +176,7 @@ export default function MesTrajets() {
               </div>
               <div className="flex items-center gap-1">
                 <FaEuroSign className="flex-shrink-0" />
-                <span>{trajet.prix}€</span>
+                <span>{trajet.prix} $CA</span>
               </div>
             </div>
           </div>

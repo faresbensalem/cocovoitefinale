@@ -315,7 +315,7 @@ export default function TrajetDetail({ params }) {
             ) : (
               <>
                 <FaCreditCard />
-                <span>Payer {(trajet.prix * nbPlaces).toFixed(2)} €</span>
+                <span>Payer {(trajet.prix * nbPlaces).toFixed(2)} $CA</span>
               </>
             )}
           </button>
@@ -418,7 +418,7 @@ export default function TrajetDetail({ params }) {
             <p className="text-lg text-gray-700 flex items-center">
               <FaDollarSign className="mr-3 text-green-500 text-xl" />
               <span className="font-medium">Prix par place :</span>
-              <span className="ml-2">{trajet.prix} €</span>
+              <span className="ml-2">{trajet.prix} $CA</span>
             </p>
           </div>
 
@@ -435,7 +435,7 @@ export default function TrajetDetail({ params }) {
               >
                 {[...Array(Math.min(trajet.places, 8))].map((_, i) => (
                   <option key={i + 1} value={i + 1}>
-                    {i + 1} {i + 1 === 1 ? "place" : "places"} - {((i + 1) * trajet.prix).toFixed(2)} €
+                    {i + 1} {i + 1 === 1 ? "place" : "places"} - {((i + 1) * trajet.prix).toFixed(2)} $CA
                   </option>
                 ))}
               </select>

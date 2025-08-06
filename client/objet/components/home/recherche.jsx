@@ -481,7 +481,7 @@ export default function Recherche({
                         </div>
                       </div>
                       <div className="flex flex-col justify-center items-center mt-4 sm:mt-0 sm:ml-4">
-                        <p className="text-xl font-bold text-gray-600">{trajet.prix} €</p>
+                        <p className="text-xl font-bold text-gray-600">{trajet.prix} $CA</p>
                         {isComplet ? (
                           <div className="bg-red-100 text-red-600 px-6 py-2 rounded-md mt-2 text-center font-semibold">
                             Complet
