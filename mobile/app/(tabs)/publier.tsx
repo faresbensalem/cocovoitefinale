@@ -443,7 +443,10 @@ export default function PublierScreen() {
                 <View style={styles.noVehicleContainer}>
                   <Ionicons name="car" size={48} color="#ccc" />
                   <Text style={styles.noVehicleText}>Vous n'avez pas encore ajouté de voiture</Text>
-                  <TouchableOpacity style={styles.addVehicleButton}>
+                  <TouchableOpacity 
+                    style={styles.addVehicleButton}
+                    onPress={() => router.push('/(tabs)/voiture')}
+                  >
                     <Text style={styles.addVehicleButtonText}>Ajouter une voiture</Text>
                   </TouchableOpacity>
                 </View>
@@ -534,6 +537,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingBottom: 150, // Marge pour éviter que la barre de navigation cache le contenu
   },
   formContainer: {
     padding: 20,

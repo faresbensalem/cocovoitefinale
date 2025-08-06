@@ -711,6 +711,7 @@ const styles = StyleSheet.create({
   trajetsContainer: {
     flex: 1,
     padding: 16,
+    paddingBottom: 150, // Marge pour éviter que la barre de navigation cache le contenu
   },
   loadingText: {
     textAlign: 'center',

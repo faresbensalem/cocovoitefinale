@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    paddingBottom: 150, // Marge pour éviter que la barre de navigation cache le contenu
   },
   subtitle: {
     fontSize: 20,

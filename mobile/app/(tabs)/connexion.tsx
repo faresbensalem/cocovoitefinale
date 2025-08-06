@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#f5f5f5',
+    paddingBottom: 150, // Marge pour éviter que la barre de navigation cache le contenu
   },
   header: {
     alignItems: 'center',

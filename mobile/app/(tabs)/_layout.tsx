@@ -21,10 +21,17 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+            height: 90,
+            paddingBottom: 20,
           },
-          default: {},
+          android: {
+            height: 70,
+            paddingBottom: 10,
+          },
+          default: {
+            height: 70,
+            paddingBottom: 10,
+          },
         }),
       }}>
       <Tabs.Screen
@@ -64,10 +71,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="profile"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, size }) => <Ionicons name="car-sport-outline" size={size ?? 28} color={color} />, 
+          title: 'Profil',
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size ?? 28} color={color} />, 
+        }}
+      />
+      <Tabs.Screen
+        name="voiture"
+        options={{
+          title: 'Voiture',
+          href: null, // Cache cet onglet de la navigation
         }}
       />
     </Tabs>
