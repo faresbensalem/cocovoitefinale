@@ -76,7 +76,13 @@ export default function TabLayout() {
           title: 'Inscription',
           href: null, // Cache cet onglet de la navigation
         }}
-      />
+      /> <Tabs.Screen
+      name="reservations"
+      options={{
+        title: 'Réserver',
+        tabBarIcon: ({ color, size }) => <Ionicons name="reader-outline" size={size ?? 28} color={color} />,
+      }}
+    />
       <Tabs.Screen
         name="profile"
         options={{
@@ -84,13 +90,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size ?? 28} color={color} />, 
         }}
       />
-      <Tabs.Screen
-        name="reservations"
-        options={{
-          title: 'Réservations',
-          tabBarIcon: ({ color, size }) => <Ionicons name="reader-outline" size={size ?? 28} color={color} />,
-        }}
-      />
+     
       <Tabs.Screen
         name="voiture"
         options={{

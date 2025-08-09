@@ -284,7 +284,7 @@ export default function MesTrajetsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#f5f5f5', marginTop: 45 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f5f5', padding: 24 },
   loadingText: { marginTop: 12, color: '#666' },
   errorText: { color: '#FF3B30', fontWeight: '600', marginBottom: 12 },

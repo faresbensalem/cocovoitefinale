@@ -251,7 +251,7 @@ export default function ReservationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#f5f5f5',marginTop: 45  },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f5f5', padding: 24 },
   loadingText: { marginTop: 12, color: '#666' },
   title: { fontSize: 20, fontWeight: '700', color: '#333' },
