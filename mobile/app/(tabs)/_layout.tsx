@@ -56,6 +56,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="mestrajet"
+        options={{
+          title: 'Mes trajets',
+          tabBarIcon: ({ color, size }) => <Ionicons name="map-outline" size={size ?? 28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="connexion"
         options={{
           title: 'Connexion',
@@ -75,6 +82,13 @@ export default function TabLayout() {
         options={{
           title: 'Profil',
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size ?? 28} color={color} />, 
+        }}
+      />
+      <Tabs.Screen
+        name="reservations"
+        options={{
+          title: 'Réservations',
+          tabBarIcon: ({ color, size }) => <Ionicons name="reader-outline" size={size ?? 28} color={color} />,
         }}
       />
       <Tabs.Screen

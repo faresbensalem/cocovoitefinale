@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal, FlatList } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 // Liste des villes canadiennes (comme dans la version web)
 const canadianCities = [
@@ -532,7 +533,7 @@ export default function RechercheScreen() {
                       isComplet && styles.disabledButton
                     ]}
                     disabled={isComplet}
-                    onPress={() => Alert.alert('Détails', `Trajet vers ${trajet.destination}`)}
+                    onPress={() => router.push(`/trajet/${trajet.id}`)}
                   >
                     <Text style={[
                       styles.actionButtonText,
