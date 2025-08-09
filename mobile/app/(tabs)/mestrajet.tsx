@@ -200,7 +200,8 @@ export default function MesTrajetsScreen() {
               </View>
               <View style={styles.reservationRight}>
                 <Text style={styles.placesText}>{r.nbPlaces} place(s)</Text>
-                <Text style={[styles.statutText,
+                <Text style={[
+                  styles.statutText,
                   r.statut === 'CONFIRMEE' ? styles.statutOk : r.statut === 'EN_ATTENTE' ? styles.statutWait : styles.statutCancel
                 ]}>{r.statut}</Text>
               </View>
@@ -312,15 +313,15 @@ const styles = StyleSheet.create({
   secondaryText: { fontWeight: '700' },
   reservationsBox: { backgroundColor: '#F9FAFB', marginTop: 12, padding: 10, borderRadius: 10 },
   sectionTitle: { fontWeight: '700', color: '#333', marginBottom: 8 },
-  reservationItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#F3F4F6', marginBottom: 8 },
-  reservationLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  reservationItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#F3F4F6', marginBottom: 8, flexWrap: 'wrap' },
+  reservationLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, flexWrap: 'wrap' },
   avatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#3B82F6', alignItems: 'center', justifyContent: 'center' },
   passagerName: { fontWeight: '700', color: '#333' },
-  passagerMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
+  passagerMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' },
   passagerMeta: { color: '#666' },
   phoneRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   phoneText: { color: '#2563EB' },
-  reservationRight: { alignItems: 'flex-end', minWidth: 110 },
+  reservationRight: { alignItems: 'flex-end', justifyContent: 'center', minWidth: 110 },
   placesText: { color: '#16A34A', fontWeight: '700' },
   statutText: { marginTop: 2, fontWeight: '700' },
   statutOk: { color: '#16A34A' },
